@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="ru">
+<head><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#05070c"><link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><script src="/static-shim.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Футбол — xGscore против рынка</title>
+<meta name="theme-color" content="#05070c">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='12' stroke='%232ee584' stroke-width='3' fill='none'/><path d='M16 9l5 4-2 6h-6l-2-6z' fill='%232ee584'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#05070c; --card:rgba(15,20,31,.72); --card-solid:#0f141f; --line:rgba(148,163,184,.12); --line-2:rgba(148,163,184,.24);
+  --text:#eef2f8; --muted:#9aa5b8; --faint:#6b778e; --good:#2ee584; --bad:#ff5470; --warn:#f5c04a; --ice:#3cc8ff; --c:#2ee584;
+  --font:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --display:"Unbounded","Inter",sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace; color-scheme:dark; }
+:root[data-theme="light"] { --bg:#f4f6fa; --card:rgba(255,255,255,.86); --card-solid:#fff; --line:rgba(15,23,42,.09); --line-2:rgba(15,23,42,.18);
+  --text:#0c1322; --muted:#4f5b70; --faint:#737d90; --good:#0f9d58; --bad:#e0244a; --warn:#b7791f; --c:#0f9d58; color-scheme:light; }
+* { box-sizing:border-box; } html,body { margin:0; }
+body { font:15px/1.55 var(--font); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased;
+  background:radial-gradient(800px 420px at 12% -8%,rgba(46,229,132,.13),transparent 60%),radial-gradient(800px 420px at 92% -4%,rgba(60,200,255,.10),transparent 60%),var(--bg); background-attachment:fixed; }
+a { color:inherit; text-decoration:none; } button,select { font:inherit; color:inherit; }
+.wrap { max-width:1120px; margin:0 auto; padding:0 20px; } .mono { font-family:var(--mono); font-variant-numeric:tabular-nums; }
+.nav { position:sticky; top:0; z-index:20; backdrop-filter:blur(16px); background:color-mix(in srgb,var(--bg) 70%,transparent); border-bottom:1px solid var(--line); }
+.nav .wrap { height:56px; display:flex; align-items:center; gap:14px; }
+.logo { display:flex; align-items:center; gap:9px; font-family:var(--display); font-weight:700; font-size:16px; letter-spacing:.06em; }
+.logo svg { width:24px; height:24px; } .crumb { color:var(--faint); font-weight:600; font-size:13px; }
+.nav-right { margin-left:auto; display:flex; gap:8px; align-items:center; }
+.pulse { display:inline-flex; align-items:center; gap:7px; height:28px; padding:0 11px; border-radius:999px; border:1px solid var(--line); background:var(--card); font-size:12px; font-weight:600; color:var(--muted); }
+.pulse i { width:7px; height:7px; border-radius:50%; background:var(--faint); } .pulse.on i { background:var(--good); } .pulse.on { color:var(--text); }
+.icon-btn { width:34px; height:34px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--muted); cursor:pointer; }
+h1 { font-family:var(--display); font-weight:800; font-size:clamp(22px,3vw,30px); letter-spacing:-.03em; margin:0; } h1 b { color:var(--c); }
+.top { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap; padding:24px 0 14px; }
+.lead { margin:6px 0 0; color:var(--muted); font-size:14px; max-width:640px; }
+.kpis { display:flex; gap:8px; flex-wrap:wrap; } .kpi { padding:8px 14px; border-radius:12px; border:1px solid var(--line); background:var(--card); min-width:112px; }
+.kpi b { display:block; font-family:var(--display); font-size:17px; letter-spacing:-.02em; font-variant-numeric:tabular-nums; } .kpi b.good { color:var(--good); } .kpi b.bad { color:var(--bad); }
+.kpi span { font-size:11px; color:var(--faint); }
+.note { margin:4px 0 14px; padding:11px 14px; border-radius:14px; border:1px solid color-mix(in srgb,var(--warn) 35%,var(--line)); background:color-mix(in srgb,var(--warn) 7%,var(--card)); color:var(--muted); font-size:13px; }
+.note b { color:var(--text); }
+.tabs { display:flex; gap:6px; overflow-x:auto; padding:2px 0 12px; scrollbar-width:none; }
+.tab { flex:none; height:38px; padding:0 16px; border-radius:12px; border:1px solid var(--line); background:var(--card); cursor:pointer; font-weight:600; font-size:13.5px; color:var(--muted); }
+.tab[aria-selected="true"] { color:var(--text); border-color:color-mix(in srgb,var(--c) 70%,transparent); background:color-mix(in srgb,var(--c) 12%,var(--card-solid)); }
+.card { border:1px solid var(--line); border-radius:18px; background:var(--card); padding:14px 16px; margin-bottom:12px; }
+.card h3 { margin:0 0 8px; font-family:var(--display); font-size:14px; letter-spacing:-.01em; }
+table { width:100%; border-collapse:collapse; font-size:13.5px; } th,td { padding:8px 8px; text-align:left; border-bottom:1px solid var(--line); white-space:nowrap; }
+th { color:var(--faint); font-weight:600; font-size:11.5px; letter-spacing:.04em; } td.r,th.r { text-align:right; } .scroll { overflow-x:auto; }
+.good { color:var(--good); } .bad { color:var(--bad); } .dim { color:var(--faint); }
+.game { display:grid; grid-template-columns:150px 1.1fr 1fr; gap:14px; align-items:center; padding:12px 0; border-bottom:1px solid var(--line); }
+.game:last-child { border-bottom:0; } .gt { font-size:12px; color:var(--faint); } .gt b { display:block; color:var(--text); font-size:13px; }
+.teams { font-weight:700; display:flex; flex-direction:column; gap:4px; } .teams small { font-weight:500; color:var(--faint); font-size:12px; }
+.tm { display:flex; align-items:center; gap:8px; } .tm img { width:22px; height:22px; object-fit:contain; }
+.bars { display:grid; gap:5px; } .bar { display:grid; grid-template-columns:62px 1fr 44px; gap:8px; align-items:center; font-size:12px; color:var(--muted); }
+.bar i { display:block; height:8px; border-radius:6px; background:var(--line); position:relative; overflow:hidden; } .bar i::after { content:""; position:absolute; inset:0 auto 0 0; width:var(--w); background:var(--col); border-radius:6px; }
+.bar b { text-align:right; color:var(--text); font-family:var(--mono); font-size:12px; }
+.chip { display:inline-block; padding:2px 8px; border-radius:999px; font-size:11.5px; font-weight:600; border:1px solid var(--line-2); margin:0 4px 2px 0; }
+.chip.g { color:var(--good); border-color:color-mix(in srgb,var(--good) 45%,transparent); } .chip.b { color:var(--bad); border-color:color-mix(in srgb,var(--bad) 45%,transparent); } .chip.o { color:var(--warn); }
+.row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px; } select { height:34px; padding:0 10px; border-radius:10px; border:1px solid var(--line-2); background:var(--card-solid); }
+.pager { display:flex; gap:8px; align-items:center; justify-content:center; margin-top:10px; } .btn { height:34px; padding:0 14px; border-radius:10px; border:1px solid var(--line-2); background:var(--card); cursor:pointer; font-weight:600; }
+.btn:disabled { opacity:.4; cursor:default; } .grid3 { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px; }
+.curve { height:64px; } .curve svg { width:100%; height:100%; } .empty { color:var(--faint); padding:18px 4px; }
+.how p { color:var(--muted); font-size:13.5px; margin:6px 0; } .how h3 { margin-top:14px; }
+a.ext { color:var(--ice); } footer { padding:18px 0 28px; color:var(--faint); font-size:12px; }
+@media (max-width:760px) { .game { grid-template-columns:1fr; gap:6px; } .wrap { padding:0 14px; } }
+
+.hero { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin:6px 0 14px; }
+.big { border:1px solid var(--line); border-radius:18px; background:var(--card); padding:14px 18px; position:relative; overflow:hidden; }
+.big::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--k,var(--c)); }
+.big small { display:block; color:var(--faint); font-size:12px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; }
+.big b { display:block; font-family:var(--display); font-size:clamp(24px,3.4vw,34px); letter-spacing:-.03em; margin:2px 0 2px; font-variant-numeric:tabular-nums; }
+.big span { color:var(--muted); font-size:12.5px; }
+.day { margin:18px 2px 6px; font-size:12px; font-weight:700; letter-spacing:.08em; color:var(--faint); text-transform:uppercase; }
+.m { display:grid; grid-template-columns:96px 1.15fr 1fr 1.25fr; gap:16px; align-items:center; padding:14px 16px; border:1px solid var(--line); border-radius:16px; background:var(--card); margin-bottom:8px; }
+.m .tt { font-family:var(--mono); font-size:20px; font-weight:700; } .m .tt small { display:block; font-family:var(--font); font-size:11.5px; color:var(--faint); font-weight:500; }
+.dec { font-size:12.5px; color:var(--muted); display:grid; gap:5px; }
+.pos { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:6px 9px; border-radius:11px; border:1px solid color-mix(in srgb,var(--good) 40%,var(--line)); background:color-mix(in srgb,var(--good) 7%,transparent); }
+.pos b { color:var(--text); } .pos .e { color:var(--good); font-family:var(--mono); font-weight:700; }
+.st { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:2px 9px; border-radius:999px; border:1px solid var(--line-2); color:var(--muted); width:max-content; }
+.st i { width:7px; height:7px; border-radius:50%; background:var(--faint); } .st.ok i { background:var(--good); } .st.wait i { background:var(--warn); }
+.scale { position:relative; height:26px; min-width:150px; }
+.scale::before { content:""; position:absolute; left:0; right:0; top:12px; height:3px; border-radius:3px; background:var(--line-2); }
+.scale .rng { position:absolute; top:11px; height:5px; border-radius:3px; background:color-mix(in srgb,var(--good) 55%,transparent); }
+.scale .mk { position:absolute; top:5px; width:2px; height:17px; border-radius:2px; transform:translateX(-1px); }
+.scale .mk.p { background:var(--good); } .scale .mk.e { background:var(--muted); } .scale .mk.n { background:var(--ice); width:3px; }
+.leg { display:flex; gap:12px; flex-wrap:wrap; font-size:11.5px; color:var(--faint); margin:6px 0 0; } .leg i { display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:5px; vertical-align:-1px; }
+.logrow { display:grid; grid-template-columns:110px 1fr; gap:10px; padding:5px 0; border-bottom:1px solid var(--line); font-size:13px; } .logrow:last-child { border-bottom:0; }
+.logrow time { color:var(--faint); font-family:var(--mono); font-size:12px; } .logrow.ERR { color:var(--bad); }
+@media (max-width:860px) { .m { grid-template-columns:1fr; gap:10px; } }
+
+.pgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:12px; }
+.pc { border:1px solid var(--line); border-radius:16px; background:var(--card-solid); padding:13px 15px; display:grid; gap:10px; }
+.pc-h { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; } .pc-h b { font-size:14.5px; }
+.pc-n { display:grid; grid-template-columns:1.25fr .9fr 1.2fr; gap:10px; } .pc-n small { display:block; color:var(--faint); font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; line-height:1.25; min-height:26px; }
+.pc-n b { display:block; font-family:var(--mono); font-size:17px; font-variant-numeric:tabular-nums; margin:1px 0 2px; white-space:nowrap; }
+.pc-f { display:flex; flex-wrap:wrap; gap:4px 14px; font-size:12.5px; color:var(--muted); border-top:1px solid var(--line); padding-top:8px; } .pc-f b { color:var(--text); font-family:var(--mono); }
+.pc-f b.good { color:var(--good); } .pc-f b.bad { color:var(--bad); }
+</style>
+<link rel="stylesheet" href="/mobile.css?v=3"></head>
+<body>
+<header class="nav"><div class="wrap">
+  <a class="logo" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12" stroke="var(--good)" stroke-width="3" fill="none"/><path d="M16 9l5 4-2 6h-6l-2-6z" fill="var(--good)"/></svg>EDGE</a>
+  <a class="crumb" href="/#football">Футбол</a><span class="crumb">/</span><span class="crumb" style="color:var(--text)">xGscore</span>
+  <div class="nav-right"><span class="pulse" id="pulse" title="Бумажный робот на прогнозах xGscore"><i></i><span>робот · бумага</span></span><button class="icon-btn" id="theme" aria-label="Тема">◐</button></div>
+</div></header>
+<main class="wrap">
+  <div class="top">
+    <div><h1><b>Футбол</b>: xGscore против Polymarket</h1>
+      <p class="lead">Мы не строим свою модель: берём готовые вероятности сервиса xGscore и ставим, когда они сильно расходятся с ценой Polymarket. Здесь — проверка этой идеи на истории, бумажный робот вперёд и реальные ставки кошелька.</p></div>
+    
+  </div>
+  <div class="note" id="note"></div>
+  <div class="hero" id="hero"></div>
+  <nav class="tabs" id="tabs" role="tablist"></nav>
+  <section id="view"></section>
+  <footer>Данные: xGscore (прогнозы публикуются за 2–3 дня до матча и больше не меняются), Polymarket (цены, итоги). Только для личного пользования. Реальные ставки отсюда не отправляются.</footer>
+</main>
+<script>
+"use strict";
+const $ = (s, el = document) => el.querySelector(s);
+const nf = (v, d = 0) => v == null ? "—" : Number(v).toLocaleString("ru-RU", { minimumFractionDigits: d, maximumFractionDigits: d });
+const pct = (v, d = 0) => v == null ? "—" : (100 * v).toFixed(d) + "%";
+const money = (v) => v == null ? "—" : (v >= 0 ? "+$" : "−$") + nf(Math.abs(v), Math.abs(v) < 100 ? 1 : 0);
+const roiS = (v) => v == null ? "—" : (v >= 0 ? "+" : "−") + Math.abs(100 * v).toFixed(1) + "%";
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const dt = (t) => new Date(t * 1000).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+const dmy = (t) => new Date(t * 1000).toLocaleDateString("ru-RU");
+const LG = { epl: "АПЛ", lal: "Ла Лига", bun: "Бундеслига", sea: "Серия А", fl1: "Лига 1", ucl: "ЛЧ", uel: "ЛЕ", ere: "Эредивизи", por: "Португалия", arg: "Аргентина", bra: "Бразилия", mex: "Мексика", mls: "MLS", nor: "Норвегия", swe: "Швеция", den: "Дания", ukr1: "Украина", unl: "Лига наций", fifwc: "ЧМ", fif: "Товарищеские",
+  "epl2": "АПЛ", "champions-league": "ЛЧ", "europa-league": "ЛЕ", "la-liga": "Ла Лига", "serie-a": "Серия А", "league-1": "Лига 1", "eredivisie": "Эредивизи", "primeira-liga": "Португалия", "argentina-primera": "Аргентина", "brazil-serie-a": "Бразилия", "liga-mx": "Мексика", "norway-eliteserien": "Норвегия", "sweden-allsvenskan": "Швеция", "danish-superliga": "Дания", "ukrainian-premier-league": "Украина", "nations-league": "Лига наций", "wc-qualifiers-europe": "Отбор ЧМ", "international-friendlies": "Товарищеские" };
+const lg = (s) => LG[s] || s;
+function theme(t) { document.documentElement.dataset.theme = t; try { localStorage.setItem("theme", t); } catch (e) {} }
+let th = "dark"; try { th = localStorage.getItem("theme") || "dark"; } catch (e) {} theme(th);
+$("#theme").onclick = () => theme(document.documentElement.dataset.theme === "light" ? "dark" : "light");
+const J = (u) => fetch(u).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
+const TABS = [["up", "Матчи"], ["bets", "Ставки"], ["bot", "Робот"], ["hist", "Проверка на истории"], ["real", "Реальные ставки"], ["past", "Прошлые матчи"]];
+let OV = null, TAB = (location.hash.slice(2) === "how" ? "bot" : location.hash.slice(2)) || "bets";
+if (!TABS.some((t) => t[0] === TAB)) TAB = "bets";
+$("#tabs").innerHTML = TABS.map(([id, n]) => `<button class="tab" role="tab" data-t="${id}">${n}</button>`).join("");
+document.querySelectorAll(".tab").forEach((b) => b.onclick = () => { TAB = b.dataset.t; history.replaceState(null, "", "#/" + TAB); render(); });
+
+function bar(name, p, col) { return `<div class="bar"><span>${name}</span><i style="--w:${p == null ? 0 : 100 * p}%;--col:${col}"></i><b>${pct(p)}</b></div>`; }
+function betChips(bs) {
+  return (bs || []).map((b) => { const cls = b.status === "won" ? "g" : b.status === "lost" ? "b" : "o";
+    return `<span class="chip ${cls}" title="вход ${nf(b.eff || b.ask, 3)}${b.edge != null ? ", перевес " + (100 * b.edge).toFixed(1) + " п.п." : ""}${b.pnl != null ? ", итог " + money(b.pnl) : ""}">${esc(b.label)}${b.pnl != null ? " " + money(b.pnl) : ""}</span>`; }).join("");
+}
+function curveSvg(pts, col) {
+  if (!pts || pts.length < 2) return `<div class="empty">Пока мало закрытых ставок</div>`;
+  const W = 400, H = 64, lo = Math.min(0, ...pts), hi = Math.max(0, ...pts), sp = hi - lo || 1;
+  const X = (i) => i / (pts.length - 1) * W, Y = (v) => H - 4 - (v - lo) / sp * (H - 10);
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><line x1="0" x2="${W}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--line-2)" stroke-dasharray="3 5"/><path d="${pts.map((v, i) => (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1)).join(" ")}" fill="none" stroke="${col}" stroke-width="2.2" vector-effect="non-scaling-stroke"/></svg>`;
+}
+const cls = (v) => v == null ? "" : v >= 0 ? "good" : "bad";
+
+const c1 = (v) => v == null ? "—" : (v >= 0 ? "+" : "−") + Math.abs(100 * v).toFixed(1) + "¢";
+const pp = (v) => v == null ? "—" : (v >= 0 ? "+" : "−") + Math.abs(100 * v).toFixed(1) + " п.п.";
+const ago = (t) => { if (!t) return "—"; const m = Math.max(0, Math.round((Date.now() / 1000 - t) / 60)); return m < 1 ? "только что" : m < 90 ? m + " мин назад" : Math.round(m / 60) + " ч назад"; };
+const pmT = (b) => b.pm_status === "resolved" ? `<span class="chip g" title="рынок закрыт, выплата ${nf(b.pm_res, 2)} за акцию">подтверждено</span>` : b.pm_status === "proposed" ? `<span class="chip o" title="исход предложен, идёт окно оспаривания (~2 ч), выплата ${nf(b.pm_res, 2)} за акцию">предложено</span>` : `<span class="chip" title="Polymarket ещё не назвал исход">ждём</span>`;
+const stT = (b) => b.status === "open" ? '<span class="chip o">открыта</span>' : b.status === "won" ? '<span class="chip g">выиграна</span>' : b.status === "void" ? '<span class="chip">отмена</span>' : '<span class="chip b">проиграна</span>';
+const WD = ["воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота"];
+const dayName = (t) => { const d = new Date(t * 1000); return WD[d.getDay()] + ", " + d.toLocaleDateString("ru-RU"); };
+const hm = (t) => new Date(t * 1000).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+function scale(prob, entry, now_) {   // шкала 0–100%: зелёная метка — прогноз xGscore, серая — цена входа, голубая — цена сейчас
+  const x = (v) => Math.max(1, Math.min(99, 100 * v)).toFixed(1);
+  const lo = Math.min(entry, prob), hi = Math.max(entry, prob);
+  return `<div class="scale" title="прогноз ${pct(prob, 1)} · вход ${nf(entry, 3)} · сейчас ${nf(now_, 3)}"><span class="rng" style="left:${x(lo)}%;width:${(x(hi) - x(lo)).toFixed(1)}%"></span><span class="mk p" style="left:${x(prob)}%"></span><span class="mk e" style="left:${x(entry)}%"></span><span class="mk n" style="left:${x(now_)}%"></span></div>`;
+}
+function heroHtml() {
+  const o = OV.open || { n: 0, stake: 0, value: 0 }, bk = OV.bank, pl = OV.plans[0], pn = o.value - o.stake;
+  const card = (k, t, v, s, cl) => `<div class="big" style="--k:${k}"><small>${t}</small><b class="${cl || ""}">${v}</b><span>${s}</span></div>`;
+  return card("var(--c)", "Банк (бумага)", bk ? "$" + nf(bk.equity, 2) : "$250", bk ? `старт $${nf(bk.start, 0)} · ставки считаются от $${nf(bk.ref, 2)}` : "ставок ещё нет", bk ? cls(bk.equity - bk.start) : "")
+    + card("var(--warn)", "Сейчас в ставках", "$" + nf(o.stake, 2), `${o.n} открытых · ждут Polymarket: ${(OV.pulse_info && OV.pulse_info.waiting_pm) || 0}`)
+    + card("var(--ice)", "Если продать сейчас", money(pn), "по цене лучшей покупки, без учёта исхода матча", cls(pn))
+    + card("var(--good)", "Закрытые ставки", pl ? money(pl.pnl) : "$0", pl ? `${pl.n_done} шт · ROI ${roiS(pl.roi)} · CLV ${pl.clv == null ? "—" : c1(pl.clv)}` : "первые матчи ещё не сыграны", pl ? cls(pl.pnl) : "");
+}
+
+
+async function vUp() {
+  const d = await J("/api/xg/upcoming");
+  if (!d.length) return `<div class="card empty">Ближайших матчей с прогнозом xGscore нет${OV.last_error ? " (" + esc(OV.last_error) + ")" : ""}.</div>`;
+  let day = "", out = "";
+  for (const g of d) {
+    const dn = dayName(g.kick);
+    if (dn !== day) { day = dn; out += `<div class="day">${dn}</div>`; }
+    const info = g.pm_info ? JSON.parse(g.pm_info) : null;
+    const st = !g.pm_slug ? `<span class="st wait"><i></i>ждём Polymarket — опрос каждые 3 мин</span>`
+      : `<span class="st ok"><i></i>на Polymarket${info ? " · " + info.n_quotes + " рынков" : ""} · проверено ${ago(info ? info.t : g.pm_checked)}</span>`;
+    const pos = (g.bets || []).map((b) => `<div class="pos"><b>${esc(b.label)}</b> <span>вход ${nf(b.ask, 3)}</span> <span class="e">${pp(b.prob - b.ask)}</span> <span>$${nf(b.stake, 2)}</span>${b.last_price != null ? ` <span class="${cls(b.last_price - b.ask)} mono">сейчас ${nf(b.last_price, 3)} (${c1(b.last_price - b.ask)})</span>` : ""}${b.status !== "open" ? stT(b) : ""}</div>`).join("");
+    const none = info ? Object.entries(info.cats || {}).map(([cat, x]) => `<div class="dim">${esc(cat)}: лучший ${esc(x.label)}, перевес ${pp(x.edge - 0)}${x.why ? ` — не ставим: ${esc(x.why)}` : ""}</div>`).join("") : "";
+    out += `<div class="m"><div class="tt">${hm(g.kick)}<small>${esc(lg(g.league))}</small></div>
+      <div class="teams"><span class="tm">${g.home_logo ? `<img src="${esc(g.home_logo)}" alt="">` : ""}${esc(g.home)}</span><span class="tm">${g.away_logo ? `<img src="${esc(g.away_logo)}" alt="">` : ""}${esc(g.away)}</span>
+        <small>xGscore ждёт ${nf(g.fch, 1)} : ${nf(g.fca, 1)} гола</small></div>
+      <div class="bars">${bar("П1", g.p1, "var(--c)")}${bar("Ничья", g.px, "var(--faint)")}${bar("П2", g.p2, "var(--ice)")}<div class="dim" style="font-size:12px">тотал больше 2.5: ${pct(g.over25)} · обе забьют: ${pct(g.btts)}</div></div>
+      <div class="dec">${st}${pos}${none || (g.pm_slug && !pos ? '<div class="dim">ставок по правилам нет</div>' : "")}</div></div>`;
+  }
+  return out;
+}
+
+function histTable(rows, key, title) {
+  if (!rows || !rows.length) return "";
+  return `<div class="card"><h3>${title}</h3><div class="scroll"><table><tr><th>${key[1]}</th><th class="r">Ставок</th><th class="r">Оборот</th><th class="r">Итог</th><th class="r">ROI</th><th class="r">90% интервал</th><th class="r">Выигрыш</th></tr>
+    ${rows.map((r) => `<tr><td>${esc(r.name)}</td><td class="r mono">${r.n}</td><td class="r mono">$${nf(r.stake)}</td><td class="r mono ${cls(r.pnl)}">${money(r.pnl)}</td><td class="r mono ${cls(r.roi)}">${roiS(r.roi)}</td><td class="r mono dim">${roiS(r.lo)} … ${roiS(r.hi)}</td><td class="r mono">${pct(r.win)}</td></tr>`).join("")}</table></div></div>`;
+}
+function vHist() {
+  const b = OV.backtest;
+  if (!b) return `<div class="card empty">Проверка на истории ещё не загружена: архив прогнозов xGscore качается, результат появится здесь.</div>`;
+  const v = b.variants.map((r) => `<tr><td>${esc(r.name)}</td><td class="r mono">${r.n}</td><td class="r mono">$${nf(r.stake)}</td><td class="r mono ${cls(r.pnl)}">${money(r.pnl)}</td><td class="r mono ${cls(r.roi)}">${roiS(r.roi)}</td><td class="r mono dim">${roiS(r.lo)} … ${roiS(r.hi)}</td><td class="r mono">${r.p_le0 == null ? "—" : r.p_le0.toFixed(2)}</td><td class="r mono ${cls(r.clv)}">${r.clv == null ? "—" : (r.clv >= 0 ? "+" : "−") + Math.abs(100 * r.clv).toFixed(1) + "¢"}</td></tr>`).join("");
+  return `<div class="card how"><h3>Что проверено</h3><p>${esc(b.description)}</p></div>
+    <div class="card"><h3>Как зависит от момента входа и допущений</h3><div class="scroll"><table><tr><th>Вариант</th><th class="r">Ставок</th><th class="r">Оборот</th><th class="r">Итог</th><th class="r">ROI</th><th class="r">90% интервал</th><th class="r">P(ROI≤0)</th><th class="r">CLV</th></tr>${v}</table></div>
+    <p class="dim" style="margin:8px 0 0;font-size:12px">ROI — прибыль к обороту. Интервал — бутстреп по матчам (ставки на один матч зависимы). CLV — цена закрытия минус цена входа: положительный значит, что рынок после входа сдвинулся в нашу сторону.</p></div>
+    ${histTable(b.by_type, ["", "Тип рынка"], "По типам рынков")}${histTable(b.by_league, ["", "Лига"], "По лигам")}${histTable(b.by_month, ["", "Месяц"], "По месяцам")}
+    ${b.verdict ? `<div class="card how"><h3>Вывод</h3><p>${esc(b.verdict)}</p></div>` : ""}`;
+}
+
+function openRow(b) {
+  const fee = (b.eff || b.ask) - b.ask, gross = b.prob - b.ask;                      // перевес = прогноз xGscore минус цена рынка (до комиссии); после комиссии — b.edge
+  const has = b.last_price != null, mid = has ? b.last_price : b.ask, bid = b.last_bid, askNow = b.last_ask;
+  const d = mid - b.ask, now_ = askNow != null ? b.prob - askNow : null;
+  const val = b.shares * (bid != null ? bid : mid), pnl = val - b.stake;
+  const sm = (t) => `<span class="dim" style="font-size:12px">${t}</span>`;
+  return `<div class="pc"><div class="pc-h"><div><b>${esc(b.home)} — ${esc(b.away)}</b><div>${sm(dt(b.kick) + " · " + esc(lg(b.league)))}</div></div><span class="chip o">${esc(b.label)}</span></div>
+    <div class="pc-n"><div><small>Перевес над Polymarket</small><b class="good">${pp(gross)}</b>${sm("прогноз " + pct(b.prob, 1) + " против цены " + pct(b.ask, 1))}</div>
+      <div><small>Сумма ставки</small><b>$${nf(b.stake, 2)}</b>${sm(nf(b.shares, 1) + " акций" + (b.stake_pct != null ? " · " + nf(b.stake_pct, 1) + "% банка" : ""))}</div>
+      <div><small>Цена: вход → сейчас</small><b class="${cls(d)}">${nf(b.ask, 3)} → ${nf(mid, 3)}</b>${sm("изменение " + c1(d) + (has ? " · " + ago(b.last_t) : " · ещё не обновлялась"))}</div></div>
+    ${scale(b.prob, b.ask, mid)}
+    <div class="pc-f"><span>если продать сейчас <b class="${cls(pnl)}">${money(pnl)}</b>${sm(" по " + nf(bid != null ? bid : mid, 3))}</span><span>перевес сейчас <b class="${now_ == null ? "" : cls(now_)}">${pp(now_)}</b></span>
+      <span>после комиссии при входе <b>${pp(b.edge)}</b></span>${b.delay != null ? `<span>вход через <b>${b.delay < 5400 ? Math.round(b.delay / 60) + " мин" : Math.round(b.delay / 3600) + " ч"}</b> после прогноза</span>` : ""}</div></div>`;
+}
+async function vBets() {
+  const rows = await J("/api/xg/bets");
+  const open = rows.filter((b) => b.status === "open").sort((a, b) => a.kick - b.kick), done = rows.filter((b) => b.status !== "open");
+  const p = OV.plans[0];
+  const tr = done.map((b) => `<tr><td>${dt(b.kick)}</td><td>${esc(b.home)} — ${esc(b.away)}${b.gh != null ? ` <span class="mono dim">${b.gh}:${b.ga}</span>` : ""}</td><td>${esc(b.label)}</td>
+    <td class="r mono">${nf(b.ask, 3)}</td><td class="r mono">${pp(b.prob - b.ask)}</td><td class="r mono">$${nf(b.stake, 2)}</td><td class="r mono">${b.close_price == null ? "—" : nf(b.close_price, 3)}</td>
+    <td class="r mono">${b.clv == null ? "—" : c1(b.clv)}</td><td>${stT(b)}</td><td>${pmT(b)}</td><td class="r mono ${cls(b.pnl)}">${money(b.pnl)}</td></tr>`).join("");
+  const nPm = done.filter((b) => b.pm_status === "resolved").length, nPr = done.filter((b) => b.pm_status === "proposed").length;
+  return (open.length ? `<div class="card"><h3>Открытые ставки <span class="dim" style="font-weight:500;font-size:12px">· цена обновляется раз в 3 минуты, страница — раз в минуту</span></h3><div class="pgrid">${open.map(openRow).join("")}</div>
+      <div class="leg"><span><i style="background:var(--good)"></i>прогноз xGscore</span><span><i style="background:var(--muted)"></i>цена входа</span><span><i style="background:var(--ice)"></i>цена сейчас</span><span>перевес = прогноз − цена Polymarket в стакане (до комиссии); комиссия показана отдельно; «если продать» — по цене лучшей покупки, осторожная оценка, на деле держим до конца матча</span></div></div>`
+    : `<div class="card empty">Открытых бумажных ставок сейчас нет.</div>`) +
+    (p ? `<div class="card"><h3>Закрытые ставки — итог по времени</h3><div class="curve">${curveSvg(p.curve, "var(--c)")}</div></div>` : "") +
+    `<div class="card"><h3>Закрытые ставки <span class="dim" style="font-weight:500;font-size:12px">· итог по Polymarket: окончательно ${nPm}, предложено ${nPr} из ${done.length}; расхождений со счётом xGscore: ${done.filter((b) => b.pm_res != null && b.pnl_xg != null && Math.abs(b.pnl - b.pnl_xg) > 0.01).length}</span></h3><div class="scroll"><table><tr><th>Старт</th><th>Событие</th><th>Рынок</th><th class="r">Вход</th><th class="r">Перевес</th><th class="r">Сумма</th><th class="r">Цена перед стартом</th><th class="r">CLV</th><th>Статус</th><th>Polymarket</th><th class="r">Итог</th></tr>${tr || `<tr><td colspan="11" class="empty">Закрытых ставок пока нет — первые матчи ещё не сыграны.</td></tr>`}</table></div></div>`;
+}
+
+async function vBot() {
+  const lg_ = await J("/api/xg/log");
+  const bk = OV.bank, pi = OV.pulse_info || {};
+  return `<div class="grid3"><div class="card"><h3>Состояние</h3><div class="dec"><span class="st ${OV.alive ? "ok" : ""}"><i></i>${OV.alive ? "робот работает · последний проход " + ago(OV.pulse) : "робот не отвечает"}</span>
+      <div>матчей в ленте xGscore: <b class="mono">${nf(pi.games)}</b>, новых за проход: <b class="mono">${nf(pi.new)}</b></div>
+      <div>ждут появления на Polymarket: <b class="mono">${nf(pi.waiting_pm)}</b></div>
+      ${OV.last_error ? `<div class="bad">${esc(OV.last_error)}</div>` : ""}</div></div>
+    <div class="card"><h3>Управление банком</h3><div class="dec"><div>старт: <b class="mono">$${nf(bk ? bk.start : 250, 2)}</b> · сейчас: <b class="mono">$${nf(bk ? bk.equity : 250, 2)}</b></div>
+      <div>расчётный банк (от него считается ставка): <b class="mono">$${nf(bk ? bk.ref : 250, 2)}</b></div>
+      <div>пересчёт, когда банк уходит от расчётного на ±<b class="mono">${nf(bk ? bk.step : 25, 0)}%</b> — как у роботов НБА и НХЛ</div>
+      <div class="dim">ставка — по формуле НБА/НХЛ: 1–3% расчётного банка по разнице прогноза и цены, ×1,5·цена^0,585, потолок 5%, минимум 5 акций</div></div></div></div>
+    <div class="card"><h3>Журнал робота</h3>${lg_.map((x) => `<div class="logrow ${x.level}"><time>${dt(x.t)}</time><span>${esc(x.msg)}</span></div>`).join("") || '<div class="empty">Журнал пуст.</div>'}</div>
+    ${vHow()}`;
+}
+
+let REAL = { type: "", lg: "" };
+async function vReal() {
+  const d = await J("/api/xg/real");
+  const all = d.bets;
+  let bs = all.filter((b) => (!REAL.type || b.type === REAL.type) && (!REAL.lg || b.lg === REAL.lg));
+  const fin = bs.filter((b) => b.status !== "open");
+  const st = fin.reduce((a, b) => a + b.stake, 0), pn = fin.reduce((a, b) => a + b.pnl, 0);
+  const types = [...new Set(all.map((b) => b.type))].sort(), lgs = [...new Set(all.map((b) => b.lg))].sort();
+  const grp = (key) => { const m = {}; fin.forEach((b) => { const k = b[key]; (m[k] = m[k] || { n: 0, st: 0, pn: 0, w: 0 }); m[k].n++; m[k].st += b.stake; m[k].pn += b.pnl; m[k].w += b.pnl > 0 ? 1 : 0; }); return Object.entries(m).sort((a, b) => b[1].st - a[1].st); };
+  const gt = (rows, f) => rows.map(([k, r]) => `<tr><td>${esc(f(k))}</td><td class="r mono">${r.n}</td><td class="r mono">$${nf(r.st)}</td><td class="r mono ${cls(r.pn)}">${money(r.pn)}</td><td class="r mono ${cls(r.pn)}">${roiS(r.pn / r.st)}</td><td class="r mono">${pct(r.w / r.n)}</td></tr>`).join("");
+  const tr = bs.slice(0, 200).map((b) => `<tr><td>${dmy(b.t)}</td><td>${esc(b.title)}</td><td>${esc(b.type)}</td><td>${esc(b.outcome)}</td><td class="r mono">${nf(b.price, 2)}</td><td class="r mono">$${nf(b.stake, 2)}</td><td>${b.status === "open" ? '<span class="chip o">открыта</span>' : b.status === "sold" ? '<span class="chip">продана</span>' : b.status === "won" ? '<span class="chip g">выиграна</span>' : '<span class="chip b">проиграна</span>'}</td><td class="r mono ${cls(b.pnl)}">${money(b.pnl)}</td></tr>`).join("");
+  return `<div class="card"><div class="row"><span class="dim">Кошелёк ${esc(d.address)} · только футбол · обновлено ${dt(d.updated)}</span>
+      <select id="r-t"><option value="">Все типы</option>${types.map((x) => `<option ${x === REAL.type ? "selected" : ""}>${esc(x)}</option>`).join("")}</select>
+      <select id="r-l"><option value="">Все лиги</option>${lgs.map((x) => `<option value="${x}" ${x === REAL.lg ? "selected" : ""}>${esc(lg(x))}</option>`).join("")}</select></div>
+    <div class="row mono"><span>закрыто <b>${fin.length}</b></span><span>оборот <b>$${nf(st)}</b></span><span>итог <b class="${cls(pn)}">${money(pn)}</b></span><span>ROI <b class="${cls(pn)}">${roiS(st ? pn / st : null)}</b></span><span class="dim">открытых ${bs.length - fin.length}</span></div></div>
+    <div class="grid3"><div class="card"><h3>По типам</h3><div class="scroll"><table><tr><th>Тип</th><th class="r">Ставок</th><th class="r">Оборот</th><th class="r">Итог</th><th class="r">ROI</th><th class="r">Выигр.</th></tr>${gt(grp("type"), (k) => k)}</table></div></div>
+      <div class="card"><h3>По лигам</h3><div class="scroll"><table><tr><th>Лига</th><th class="r">Ставок</th><th class="r">Оборот</th><th class="r">Итог</th><th class="r">ROI</th><th class="r">Выигр.</th></tr>${gt(grp("lg"), lg)}</table></div></div></div>
+    <div class="card"><h3>Ставки (последние 200)</h3><div class="scroll"><table><tr><th>Дата</th><th>Событие</th><th>Тип</th><th>Исход</th><th class="r">Цена</th><th class="r">Ставка</th><th>Статус</th><th class="r">Итог</th></tr>${tr}</table></div></div>`;
+}
+function bindReal() { $("#r-t").onchange = (e) => { REAL.type = e.target.value; render(); }; $("#r-l").onchange = (e) => { REAL.lg = e.target.value; render(); }; }
+
+let PAST = { off: 0 };
+async function vPast() {
+  const lim = 60, d = await J(`/api/xg/past?limit=${lim}&offset=${PAST.off}`);
+  const rows = d.games.map((g) => { const win = g.gh > g.ga ? "p1" : g.gh < g.ga ? "p2" : "px"; const best = ["p1", "px", "p2"].reduce((a, k) => (g[k] || 0) > (g[a] || 0) ? k : a, "p1");
+    return `<tr><td>${dmy(g.kick)}</td><td>${esc(lg(g.league))}</td><td>${esc(g.home)} — ${esc(g.away)}</td><td class="mono">${g.gh}:${g.ga}</td><td class="r mono">${pct(g.p1)} / ${pct(g.px)} / ${pct(g.p2)} <span class="${best === win ? "good" : "bad"}">${best === win ? "✓" : "✗"}</span></td><td>${betChips(g.bets)}</td></tr>`; }).join("");
+  return `<div class="card"><div class="scroll"><table><tr><th>Дата</th><th>Лига</th><th>Матч</th><th>Счёт</th><th class="r">xGscore П1 / Н / П2</th><th>Ставки робота</th></tr>${rows || `<tr><td colspan="6" class="empty">Нет матчей: робот только начал накапливать историю.</td></tr>`}</table></div>
+    <div class="pager"><button class="btn" id="pv" ${PAST.off <= 0 ? "disabled" : ""}>← Новее</button><span class="dim">${d.total ? PAST.off + 1 : 0}–${Math.min(PAST.off + lim, d.total)} из ${nf(d.total)}</span><button class="btn" id="nx" ${PAST.off + lim >= d.total ? "disabled" : ""}>Старше →</button></div></div>`;
+}
+function bindPast() { $("#pv").onclick = () => { PAST.off = Math.max(0, PAST.off - 60); render(); }; $("#nx").onclick = () => { PAST.off += 60; render(); }; }
+
+function vHow() {
+  return `<div class="card how"><h3>Откуда ставки</h3>
+    <p>xGscore публикует вероятности исхода, тоталов, «обе забьют», двойного шанса и фор за 2–3 дня до матча и потом их не меняет — в архиве у каждого матча лежит именно тот прогноз, который был виден заранее. Мы сравниваем эти вероятности с ценой Polymarket (к цене покупки добавляется комиссия тейкера) и берём ставку, если перевес не меньше 2 п.п.</p>
+    <h3>Правила (как у живого бота на вашем ПК)</h3>
+    <p>Размер ставки — по формуле роботов НБА и НХЛ (то же «Управление банком», что в их реальных настройках): ставка = 1–3% расчётного банка в зависимости от разницы между прогнозом и ценой (от 3 до 12 п.п. разницы — от 1% до 3%), умноженное на 1,5·цена<sup>0,585</sup> (на фаворита ставим больше, на андердога меньше), потолок 5%. Если по формуле выходит меньше минимального ордера Polymarket (5 акций), ставка поднимается до минимума, когда он укладывается в 3% банка. Расчётный банк (старт $250) пересчитывается, когда фактический банк вырос или упал на 25%. Отбор ставок — как у живого бота: перевес после комиссии не меньше 2 п.п., по одной лучшей ставке на матч в двух категориях («исход» — П1/Н/П2, двойной шанс, форы; «голы» — тоталы, индивидуальные тоталы, обе забьют), точный счёт не берём.</p>
+    <p>Бумажный робот проверяет xGscore и Polymarket каждые 3 минуты. Новый матч в ленте xGscore — один запрос на проход, не чаще раза в секунду, при блокировке пауза час — сразу скачивается замороженный прогноз. Матч есть на Polymarket — берём рынки, считаем перевес и смотрим настоящий стакан: спред не шире 10 центов, объём в пределах 3 центов от лучшей цены, цена входа средневзвешенная по стакану плюс комиссия; если стакан неподходящий, причина видна в карточке матча и в журнале, проверка повторяется. Матча на Polymarket ещё нет — ищем его каждые 3 минуты. Размер ставки считается от «расчётного банка» (старт $125), он пересчитывается, когда банк вырос или упал на 25%. Цену купленной стороны обновляем каждый проход (для «цена сейчас» и CLV), после матча берём счёт и закрываем ставку.</p>
+    <h3>Что такое проверка на истории</h3>
+    <p>Мы берём прошлые матчи, у которых были и прогноз xGscore, и рынки на Polymarket, подставляем цену рынка на момент публикации прогноза (плюс полцента-цент спреда, потому что у закрытых рынков нет истории стакана) и применяем те же правила. Закрывающая линия букмекеров не участвует в решениях: прибыль считается по реальному счёту. CLV и сравнение с закрытием — только диагностика.</p>
+    <h3>Чего здесь нет</h3>
+    <p>Реальные ставки с сайта не отправляются: они остаются на вашем ПК в боте с подтверждением в Telegram. Вкладка «Реальные ставки» только читает публичную историю кошелька.</p></div>`;
+}
+
+let RID = 0;
+async function render() {
+  const my = ++RID;
+  document.querySelectorAll(".tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.t === TAB)));
+  const v = $("#view");
+  try {
+    const html = TAB === "up" ? await vUp() : TAB === "hist" ? vHist() : TAB === "bets" ? await vBets() : TAB === "bot" ? await vBot() : TAB === "real" ? await vReal() : await vPast();
+    if (my !== RID) return;                    // пока грузилось, вкладку сменили
+    v.innerHTML = html;
+    if (TAB === "past") bindPast();
+    if (TAB === "real") bindReal();
+  } catch (e) { if (my === RID) v.innerHTML = `<div class="card empty">Не удалось загрузить данные (${esc(e.message)}).</div>`; }
+}
+
+J("/api/xg/overview").then((o) => {
+  OV = o;
+  $("#pulse").classList.toggle("on", !!o.alive); $("#pulse span").textContent = o.alive ? "робот · бумага" : "робот выключен";
+  $("#note").innerHTML = o.blocked_until && o.blocked_until * 1000 > Date.now() ? `<b>xGscore временно блокирует запросы</b> — робот ждёт до ${new Date(o.blocked_until * 1000).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}.`
+    : `<b>Только бумага.</b> Реальные ставки с сайта не отправляются. Главный критерий — ROI на реальных исходах и поведение цены после входа (CLV), а не «красивая» цифра в симуляции.`;
+  $("#hero").innerHTML = heroHtml();
+  render();
+}).catch(() => { $("#note").textContent = "База футбола ещё не создана: робот xg-edge не запускался. Вкладка «Реальные ставки» работает и без неё."; TAB = TAB === "hist" ? "real" : TAB; OV = { plans: [], backtest: null }; render(); });
+setInterval(() => { if (TAB === "up" || TAB === "bets" || TAB === "bot") { J("/api/xg/overview").then((o) => { OV = o; $("#hero").innerHTML = heroHtml(); render(); }).catch(() => render()); } }, 60000);
+</script>
+</body>
+</html>

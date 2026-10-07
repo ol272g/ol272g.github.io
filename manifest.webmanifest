@@ -1,0 +1,25 @@
+{
+  "id": "/",
+  "name": "Edge — модели против рынка",
+  "short_name": "Edge",
+  "description": "Ставки роботов на Polymarket: NBA, NHL, NFL, Евролига, футбол, погода. Просмотр.",
+  "lang": "ru",
+  "dir": "ltr",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#05070c",
+  "theme_color": "#05070c",
+  "categories": ["finance", "sports"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Футбол", "url": "/football/", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "NHL", "url": "/nhl/#/bets", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "NBA", "url": "/nba/#/bets", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
