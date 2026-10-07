@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="ru">
+<head><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#05070c"><link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><script src="/static-shim.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Edge — модели против рынка</title>
+<meta name="description" content="Модели против цен Polymarket: баскетбол, хоккей и другие виды спорта. Честные прогнозы, симуляция ставок по журналу сделок, робот.">
+<meta name="theme-color" content="#05070c">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M6 26 16 4l10 22' stroke='%23ff7a1a' stroke-width='4' fill='none' stroke-linejoin='round'/><path d='M10 18h12' stroke='%2338bdf8' stroke-width='4'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #05070c; --bg-2: #0a0e16; --card: rgba(15, 20, 31, .72); --card-solid: #0f141f;
+  --line: rgba(148, 163, 184, .12); --line-2: rgba(148, 163, 184, .24);
+  --text: #eef2f8; --muted: #9aa5b8; --faint: #6b778e;
+  --orange: #ff7a1a; --orange-2: #ffb35c; --ice: #3cc8ff; --ice-2: #9be7ff; --green: #2ee584; --green-2: #a3f0c4;
+  --good: #2ee584; --bad: #ff5470;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; --display: "Unbounded", "Inter", sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace;
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --bg: #f4f6fa; --bg-2: #e9edf4; --card: rgba(255, 255, 255, .86); --card-solid: #fff;
+  --line: rgba(15, 23, 42, .09); --line-2: rgba(15, 23, 42, .18);
+  --text: #0c1322; --muted: #4f5b70; --faint: #737d90;
+  --orange: #ea6208; --orange-2: #f59e0b; --ice: #0284c7; --ice-2: #0ea5e9; --green: #0f9d58; --green-2: #34d399; --good: #0f9d58; --bad: #e0244a;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font: 15px/1.55 var(--font); color: var(--text); -webkit-font-smoothing: antialiased; min-height: 100vh;
+  background: radial-gradient(800px 420px at 12% -8%, rgba(255, 122, 26, .12), transparent 60%), radial-gradient(800px 420px at 92% -4%, rgba(60, 200, 255, .10), transparent 60%), var(--bg); background-attachment: fixed; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; border-radius: 10px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* шапка */
+.nav { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(16px) saturate(160%); -webkit-backdrop-filter: blur(16px) saturate(160%); background: color-mix(in srgb, var(--bg) 70%, transparent); border-bottom: 1px solid var(--line); }
+.nav .wrap { height: 56px; display: flex; align-items: center; gap: 14px; }
+.logo { display: flex; align-items: center; gap: 9px; font-family: var(--display); font-weight: 700; font-size: 16px; letter-spacing: .06em; }
+.logo svg { width: 24px; height: 24px; }
+.nav-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.pulse { display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.pulse i { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
+.pulse.on i { background: var(--good); animation: beat 2s infinite; }
+.pulse.on { color: var(--text); }
+@keyframes beat { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--good) 70%, transparent); } 70%, 100% { box-shadow: 0 0 0 7px transparent; } }
+.icon-btn { width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--muted); cursor: pointer; display: grid; place-items: center; transition: .2s var(--ease); }
+.icon-btn:hover { color: var(--text); border-color: var(--line-2); }
+
+/* заголовок и общие цифры */
+.top { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; padding: 26px 0 18px; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(22px, 3vw, 32px); line-height: 1.1; letter-spacing: -.03em; margin: 0; }
+h1 .g1 { background: linear-gradient(100deg, var(--orange), var(--orange-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+h1 .g2 { background: linear-gradient(100deg, var(--ice), var(--ice-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.lead { margin: 6px 0 0; color: var(--muted); font-size: 14px; max-width: 560px; }
+.kpis { display: flex; gap: 8px; flex-wrap: wrap; }
+.kpi { padding: 8px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); min-width: 104px; }
+.kpi b { display: block; font-family: var(--display); font-weight: 700; font-size: 17px; letter-spacing: -.02em; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.kpi b.good { color: var(--good); } .kpi b.bad { color: var(--bad); }
+.kpi span { font-size: 11px; color: var(--faint); letter-spacing: .04em; }
+
+/* вкладки видов спорта */
+.tabs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 10px; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { --c: var(--orange); flex: none; display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 18px 0 12px; border-radius: 16px; border: 1px solid var(--line); background: var(--card); cursor: pointer; font-weight: 700; font-size: 14.5px; white-space: nowrap; transition: transform .25s var(--ease), border-color .2s, background .2s, box-shadow .25s; position: relative; }
+.tab .ico { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); transition: .25s var(--ease); }
+.tab .ico svg { width: 20px; height: 20px; }
+.tab small { display: block; font-weight: 500; font-size: 11px; color: var(--faint); line-height: 1.1; margin-top: 2px; }
+.tab .dot { width: 7px; height: 7px; border-radius: 50%; background: transparent; margin-left: 2px; }
+.tab .dot.on { background: var(--good); animation: beat 2s infinite; }
+.tab:hover:not(.soon) { transform: translateY(-2px); border-color: color-mix(in srgb, var(--c) 45%, var(--line-2)); }
+.tab[aria-selected="true"] { border-color: color-mix(in srgb, var(--c) 70%, transparent); background: color-mix(in srgb, var(--c) 10%, var(--card-solid)); box-shadow: 0 10px 28px -14px var(--c); }
+.tab[aria-selected="true"] .ico { background: var(--c); color: #0b0b0b; }
+.tab.soon { cursor: not-allowed; background: color-mix(in srgb, var(--bg) 70%, #000); border-style: dashed; color: var(--faint); }
+.tab.soon .ico { background: var(--line); color: var(--faint); }
+.tab.soon .ico svg { opacity: .7; }
+
+/* карточки лиг */
+.panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 14px; animation: rise .45s var(--ease); }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.lg { --c: var(--orange); --c2: var(--orange-2); position: relative; display: flex; flex-direction: column; gap: 10px; padding: 18px 20px 16px; border-radius: 20px; border: 1px solid var(--line); background: var(--card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); overflow: hidden; isolation: isolate; transition: transform .35s var(--ease), border-color .25s; }
+.lg::before { content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0; transition: opacity .35s; background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 20%), color-mix(in srgb, var(--c) 16%, transparent), transparent 62%); }
+.lg:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--c) 50%, var(--line-2)); }
+.lg:hover::before { opacity: 1; }
+.lg.nhl { --c: var(--ice); --c2: var(--ice-2); }
+.lg.euro { --c: var(--green); --c2: var(--orange-2); }
+.lg.nfl { --c: #a78bfa; --c2: #ddd6fe; }
+.lg.xg { --c: #2ee584; --c2: #9af2c4; }
+.lg.weather { --c: #2dd4bf; --c2: #99f6e4; }
+.lg.soon { cursor: not-allowed; opacity: .5; filter: grayscale(.85); border-style: dashed; background: color-mix(in srgb, var(--bg) 70%, #000); }
+.lg.soon:hover { transform: none; border-color: var(--line); }
+.lg.soon:hover::before { opacity: 0; }
+.soon-tag { font: 600 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+.lg-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.lg-t { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.lg-t b { font-family: var(--display); font-weight: 800; font-size: 26px; letter-spacing: -.03em; line-height: 1; background: linear-gradient(100deg, var(--c), var(--c2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.lg-t span { font: 600 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
+.desc { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.5; }
+.lg-m { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 14px; }
+.curve { position: relative; height: 62px; }
+.curve svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.curve .ln { fill: none; stroke: var(--c); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: var(--len, 2000); stroke-dashoffset: var(--len, 2000); animation: draw 1.6s .15s var(--ease) forwards; }
+.curve .ar { opacity: 0; animation: fade 1s .7s forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes fade { to { opacity: 1; } }
+.pl { text-align: right; min-width: 112px; }
+.pl b { display: block; font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: -.02em; color: var(--good); line-height: 1.15; font-variant-numeric: tabular-nums; }
+.pl b.bad { color: var(--bad); }
+.pl small { font-size: 11px; color: var(--faint); }
+.lg-s { display: flex; gap: 8px; }
+.lg-s div { flex: 1; padding: 7px 10px; border-radius: 12px; border: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 40%, transparent); }
+.lg-s b { display: block; font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; line-height: 1.25; }
+.lg-s span { font-size: 11px; color: var(--faint); }
+.lg-f { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.go { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px 0 16px; border-radius: 11px; font-weight: 700; font-size: 13.5px; color: #0b0b0b; background: linear-gradient(135deg, var(--c), var(--c2)); transition: box-shadow .3s; }
+.lg:hover .go { box-shadow: 0 10px 24px -10px var(--c); }
+.go svg { width: 15px; height: 15px; transition: transform .3s var(--ease); } .go:hover svg { transform: translateX(3px); }
+.sp-q { height: 36px; padding: 0 12px; border-radius: 11px; border: 1px solid var(--line); background: none; color: var(--muted); font-weight: 600; font-size: 13px; cursor: pointer; transition: .2s; display: inline-flex; align-items: center; }
+.sp-q:hover { color: var(--text); border-color: var(--line-2); }
+.built { margin-left: auto; font-size: 11px; color: var(--faint); }
+.skel { display: inline-block; height: 1em; width: 3em; border-radius: 6px; vertical-align: middle; background: linear-gradient(90deg, var(--line), var(--line-2), var(--line)); background-size: 200% 100%; animation: sk 1.4s infinite; }
+@keyframes sk { to { background-position: -200% 0; } }
+
+/* низ страницы */
+.how { margin: 18px 0 0; border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
+.how summary { cursor: pointer; padding: 12px 18px; font-weight: 600; font-size: 13.5px; color: var(--muted); list-style: none; display: flex; align-items: center; justify-content: space-between; }
+.how summary::-webkit-details-marker { display: none; }
+.how summary::after { content: "＋"; color: var(--faint); } .how[open] summary::after { content: "−"; }
+.how[open] summary { color: var(--text); }
+.how-b { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; padding: 4px 18px 18px; }
+.how-b h4 { margin: 0 0 4px; font-family: var(--display); font-weight: 600; font-size: 13.5px; letter-spacing: -.01em; }
+.how-b h4 i { font: 700 11px var(--mono); color: var(--orange); font-style: normal; margin-right: 6px; }
+.how-b p { margin: 0; color: var(--muted); font-size: 12.5px; line-height: 1.5; }
+footer { padding: 18px 0 28px; color: var(--faint); font-size: 12px; display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+
+@media (max-width: 760px) {
+  .how-b { grid-template-columns: 1fr 1fr; }
+  .lg-m { grid-template-columns: 1fr; } .pl { text-align: left; }
+  .pulse span { display: none; } .pulse { padding: 0 9px; }
+}
+@media (max-width: 480px) {
+  .wrap { padding: 0 14px; }
+  .how-b { grid-template-columns: 1fr; }
+  .kpi { flex: 1 1 40%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  .curve .ln { stroke-dashoffset: 0; } .curve .ar { opacity: 1; }
+}
+</style>
+<link rel="stylesheet" href="/mobile.css?v=3"></head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 26 16 4l10 22" stroke="var(--orange)" stroke-width="4" fill="none" stroke-linejoin="round"/><path d="M10 18h12" stroke="var(--ice)" stroke-width="4"/></svg>EDGE</a>
+    <div class="nav-right">
+      <span class="pulse" id="p-nba" title="Робот NBA"><i></i><span>NBA</span></span>
+      <span class="pulse" id="p-nhl" title="Робот NHL"><i></i><span>NHL</span></span>
+      <span class="pulse" id="p-nfl" title="Робот НФЛ"><i></i><span>НФЛ</span></span>
+      <span class="pulse" id="p-euro" title="Робот Евролиги (только бумага)"><i></i><span>Евролига</span></span>
+      <span class="pulse" id="p-weather" title="Робот погоды (только бумага)"><i></i><span>Погода</span></span>
+      <button class="icon-btn" id="theme" title="Сменить тему" aria-label="Сменить тему"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9A7 7 0 0 1 12 3z" fill="currentColor"/></svg></button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="top">
+    <div>
+      <h1><span class="g1">Рынок</span> ошибается. <span class="g2">Мы считаем, где.</span></h1>
+      <p class="lead">Модели против цен Polymarket: прогноз за 48 часов, сравнение с рынком и робот, который ставит только при перевесе.</p>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><b class="mono" data-k="games"><span class="skel"></span></b><span>матчей в базе</span></div>
+      <div class="kpi"><b class="mono" data-k="players"><span class="skel"></span></b><span>игроков с рейтингом</span></div>
+      <div class="kpi"><b class="mono" data-k="bets"><span class="skel"></span></b><span>ставок в проверке</span></div>
+      <div class="kpi"><b class="mono" data-k="pnl"><span class="skel"></span></b><span>итог по $100 на ставку</span></div>
+    </div>
+  </div>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Виды спорта"></nav>
+  <section class="panel" id="panel" role="tabpanel" aria-live="polite"></section>
+
+  <details class="how">
+    <summary>Как это работает и как мы проверяем</summary>
+    <div class="how-b">
+      <div><h4><i>01</i>Данные</h4><p>Смены и отрезки между заменами, броски и xG, травмы, составы, вратари — из официальных API, ESPN и DailyFaceoff.</p></div>
+      <div><h4><i>02</i>Модель</h4><p>Рейтинг каждого игрока × ожидаемое время на площадке, плюс Глико-2. Учится только на прошлом.</p></div>
+      <div><h4><i>03</i>Сравнение с рынком</h4><p>За 48 часов до матча прогноз встречается с ценой Polymarket. Ставка — только при перевесе от 3 п.п.</p></div>
+      <div><h4><i>04</i>Робот</h4><p>Лимитная заявка чуть ниже середины, докупка за 36/24/12 ч, банк по Келли с лимитами. Проверка идёт по реальному журналу сделок; последние сезоны — экзамен без подгонки.</p></div>
+    </div>
+  </details>
+  <footer><span>Только для личного пользования</span><span>Данные: NBA / NHL API, ESPN, DailyFaceoff, Polymarket</span></footer>
+</main>
+
+<script>
+"use strict";
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const nf = (v) => (v == null ? "—" : Math.round(v).toLocaleString("ru-RU"));
+const money = (v) => (v >= 0 ? "+$" : "−$") + nf(Math.abs(v));
+
+/* тема */
+function theme(t) { document.documentElement.dataset.theme = t; try { localStorage.setItem("theme", t); } catch (e) { /* без сохранения */ } }
+let th = "dark"; try { th = localStorage.getItem("theme") || "dark"; } catch (e) { /* по умолчанию тёмная */ }
+theme(th);
+$("#theme").onclick = () => theme(document.documentElement.dataset.theme === "light" ? "dark" : "light");
+
+/* значки видов спорта */
+const IC = {
+  basketball: `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="16" cy="16" r="12.5"/><path d="M3.5 16h25M16 3.5v25M7 7.5c5 4 5 13 0 17M25 7.5c-5 4-5 13 0 17"/></svg>`,
+  hockey: `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><ellipse cx="16" cy="20" rx="11" ry="4.5"/><path d="M5 14.5v5.5M27 14.5v5.5"/><ellipse cx="16" cy="14.5" rx="11" ry="4.5"/></svg>`,
+  football: `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="16" r="12.5"/><path d="m16 10 5.5 4-2.1 6.4h-6.8L10.5 14zM16 10V3.8M21.5 14l5.8-1.9M19.4 20.4l3.6 5M12.6 20.4l-3.6 5M10.5 14 4.7 12.1"/></svg>`,
+  amfootball: `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 27C3 15 12 4 27 5c1.5 12-8 23-22 22z"/><path d="m12 20 8-8M14.5 14.5l3 3M17.5 11.5l3 3M11.5 17.5l3 3"/></svg>`,
+  baseball: `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="16" cy="16" r="12.5"/><path d="M8.5 6.5c3 3 3 16 0 19M23.5 6.5c-3 3-3 16 0 19M10.5 11l-3 .8M10.8 16h-3.5M10.5 21l-3-.8M21.5 11l3 .8M21.2 16h3.5M21.5 21l3-.8"/></svg>`,
+};
+IC.weather = `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M16 4v15"/><circle cx="16" cy="23.5" r="4.5"/><path d="M22 8h4M22 13h3"/></svg>`;
+const ARROW = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+/* виды спорта и лиги; soon — ещё не сделано (тёмная вкладка без перехода) */
+const SPORTS = [
+  { id: "basketball", name: "Баскетбол", color: "#ff7a1a", leagues: [
+    { id: "nba", cls: "nba", name: "NBA", sub: "Баскетбол · США", href: "/nba", desc: "SHARP — рейтинги игроков × ожидаемые минуты, Глико-2 по составам и робот на Polymarket: бумага и реальные ставки." },
+    { id: "euro", cls: "euro", name: "Евролига", sub: "Баскетбол · Европа", href: "/euro", desc: "Та же модель, что у NBA. Робот ведёт только бумажные ставки — реальных нет." },
+    { id: "wnba", cls: "wnba", name: "WNBA", sub: "Баскетбол · США, женщины", soon: true, desc: "Модель NBA перенесена и проверена на истории. Сайт и робот пока не подключены." } ] },
+  { id: "hockey", name: "Хоккей", color: "#3cc8ff", leagues: [
+    { id: "nhl", cls: "nhl", name: "NHL", sub: "Хоккей · США и Канада", href: "/nhl", desc: "xG-рейтинги по сменам, вратари, спецбригады и Глико-2. Прогноз за 48 ч по ожидаемым составам и стартовым вратарям." } ] },
+  { id: "football", name: "Футбол", color: "#2ee584", leagues: [
+    { id: "xg", cls: "xg", name: "xGscore", sub: "Футбол · 20 лиг и турниров", href: "/football", tabs: { games: "#/up", bets: "#/bets", bot: "#/how" }, desc: "Своей модели нет: берём готовые прогнозы сервиса xGscore и ставим, когда они расходятся с ценой Polymarket. Проверка на истории, бумажный робот вперёд и разбор реальных ставок кошелька." } ] },
+  { id: "amfootball", name: "Американский футбол", color: "#a78bfa", leagues: [
+    { id: "nfl", cls: "nfl", name: "NFL", sub: "Американский футбол · США", href: "/nfl", desc: "SHARP по снапам (EPA за розыгрыш), Глико-2 и смесь. Решение — во вторник перед матчем или за 24 ч, после отчёта о травмах." } ] },
+  { id: "weather", name: "Погода", color: "#2dd4bf", leagues: [
+    { id: "weather", cls: "weather", name: "Температура", sub: "Погода · Polymarket", href: "/weather", desc: "Модель минимума температуры за сутки против цен Polymarket. Робот ведёт только бумажные ставки: журнал, симуляция прошлых ставок и правила — внутри." } ] },
+  { id: "baseball", name: "Бейсбол", color: "#ff5470", soon: true },
+];
+let HUB = null, CUR = null;
+
+/* вкладки */
+$("#tabs").innerHTML = SPORTS.map((s) => `<button class="tab${s.soon ? " soon" : ""}" role="tab" data-sp="${s.id}" style="--c:${s.color}" aria-selected="false" ${s.soon ? `aria-disabled="true" title="Скоро"` : ""}>
+  <span class="ico">${IC[s.id]}</span><span>${s.name}<small>${s.soon ? "скоро" : s.leagues.filter((l) => !l.soon).length + (s.leagues.filter((l) => !l.soon).length === 1 ? " лига" : " лиги")}</small></span>${s.soon ? "" : `<i class="dot"></i>`}</button>`).join("");
+$$(".tab").forEach((t) => t.addEventListener("click", () => { if (!t.classList.contains("soon")) show(t.dataset.sp); }));
+
+/* кривая прибыли (маленькая) */
+function drawCurve(box, pts) {
+  const svg = $("svg", box);
+  if (!pts || pts.length < 2) { svg.innerHTML = ""; return; }
+  const W = 400, H = 62, lo = Math.min(0, ...pts), hi = Math.max(0, ...pts), span = hi - lo || 1;
+  const X = (i) => (i / (pts.length - 1)) * W, Y = (v) => H - 4 - ((v - lo) / span) * (H - 10);
+  const d = pts.map((v, i) => (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1)).join(" ");
+  const id = "g" + Math.random().toString(36).slice(2, 7);
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("preserveAspectRatio", "none");
+  svg.innerHTML = `<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--c);stop-opacity:.3"/><stop offset="1" style="stop-color:var(--c);stop-opacity:0"/></linearGradient></defs>
+    <line x1="0" x2="${W}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--line-2)" stroke-dasharray="3 5"/>
+    <path class="ar" d="${d} L${W} ${H} L0 ${H} Z" fill="url(#${id})"/>
+    <path class="ln" d="${d}" vector-effect="non-scaling-stroke"/>`;
+  const ln = $(".ln", svg); ln.style.setProperty("--len", Math.ceil(ln.getTotalLength() * 1.6));
+}
+
+let WXH = null;
+function weatherCard(l) {
+  const w = WXH, sk = `<span class="skel"></span>`, m2 = (v) => (v >= 0 ? "+$" : "−$") + Math.abs(v).toFixed(2);
+  const robot = !w ? "" : `<span class="pulse${w.alive && w.enabled ? " on" : ""}" title="${w.alive ? (w.enabled ? "робот работает: бумажные ставки" : "робот работает, ставки выключены") : "робот не запущен"}"><i></i><span>${w.alive ? (w.enabled ? "робот · бумага" : "ставки выкл.") : "робот выкл."}</span></span>`;
+  return `<a class="lg weather" href="${l.href}#/robot" data-lg="weather">
+    <div class="lg-h"><div class="lg-t"><b>${l.name}</b><span>${l.sub}</span></div>${robot}</div>
+    <p class="desc">${l.desc}</p>
+    <div class="lg-m"><div class="curve"><svg></svg></div><div class="pl">${!w ? sk : `<b class="${(w.paper.pnl || 0) >= 0 ? "" : "bad"}">${m2(w.paper.pnl || 0)}</b><small>бумага: ${nf(w.paper.n)} закрытых ставок</small>`}</div></div>
+    <div class="lg-s"><div><b>${!w ? sk : w.sim.roi == null ? "—" : (w.sim.roi >= 0 ? "+" : "−") + Math.abs(100 * w.sim.roi).toFixed(0) + "%"}</b><span>ROI проверки</span></div><div><b>${!w ? sk : nf(w.sim.n)}</b><span>ставок в проверке</span></div><div><b>${!w ? sk : "$" + nf(w.paper.bank)}</b><span>бумажный банк</span></div></div>
+    <div class="lg-f"><span class="go">Робот ${ARROW}</span><span class="sp-q" data-href="${l.href}#/sim">Симуляция</span><span class="sp-q" data-href="${l.href}#/rules">Стратегия</span><span class="built">только бумага</span></div>
+  </a>`;
+}
+function leagueCard(l) {
+  if (l.id === "weather") return weatherCard(l);
+  if (l.soon) return `<div class="lg soon ${l.cls}" aria-disabled="true"><div class="lg-h"><div class="lg-t"><b>${l.name}</b><span>${l.sub}</span></div><span class="soon-tag">скоро</span></div><p class="desc">${l.desc}</p></div>`;
+  const s = HUB && HUB[l.id], b = (s && s.sim) || {}, bot = s && s.bot;
+  const sk = `<span class="skel"></span>`;
+  const clv = b.clv == null ? "—" : (b.clv >= 0 ? "+" : "−") + Math.abs(100 * b.clv).toFixed(1) + "¢";
+  const robot = !HUB ? "" : `<span class="pulse${bot && bot.alive ? " on" : ""}" title="${bot && bot.alive ? (bot.real ? "робот работает: реальные ставки + бумага" : "робот работает: бумага") : "робот не запущен"}"><i></i><span>${bot && bot.alive ? (bot.real ? "робот · реально" : "робот · бумага") : "робот выкл."}</span></span>`;
+  return `<a class="lg ${l.cls}" href="${l.href}${(l.tabs || {}).games || "#/games"}" data-lg="${l.id}">
+    <div class="lg-h"><div class="lg-t"><b>${l.name}</b><span>${l.sub}</span></div>${robot}</div>
+    <p class="desc">${l.desc}</p>
+    <div class="lg-m"><div class="curve"><svg></svg></div><div class="pl">${!HUB ? sk : b.n ? `<b class="${(b.pnl || 0) >= 0 ? "" : "bad"}">${money(b.pnl)}</b><small>${nf(b.n)} ставок по $100</small>` : `<small>нет данных симуляции</small>`}</div></div>
+    <div class="lg-s"><div><b>${!HUB ? sk : nf(s && s.seasons)}</b><span>сезонов</span></div><div><b>${!HUB ? sk : nf(s && s.games)}</b><span>матчей</span></div><div><b>${!HUB ? sk : clv}</b><span>CLV на ставку</span></div></div>
+    <div class="lg-f"><span class="go">Матчи ${ARROW}</span><span class="sp-q" data-href="${l.href}${(l.tabs || {}).bets || "#/bets"}">Ставки</span><span class="sp-q" data-href="${l.href}${(l.tabs || {}).bot || "#/bot"}">Робот</span><span class="built">${s && s.built ? "обновлено " + s.built.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3.$2.$1") : ""}</span></div>
+  </a>`;
+}
+
+function show(id, push = true) {
+  const sp = SPORTS.find((x) => x.id === id && !x.soon) || SPORTS[0];
+  CUR = sp.id;
+  $$(".tab").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.sp === sp.id)));
+  const panel = $("#panel");
+  panel.style.animation = "none"; void panel.offsetWidth; panel.style.animation = "";
+  panel.innerHTML = sp.leagues.map(leagueCard).join("");
+  $$(".sp-q", panel).forEach((q) => q.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); location.href = q.dataset.href; }));
+  if (HUB) sp.leagues.filter((l) => !l.soon).forEach((l) => { const c = $(`.lg[data-lg=${l.id}] .curve`, panel); if (c) drawCurve(c, HUB[l.id] && HUB[l.id].curve); });
+  if (WXH) { const wc = $(".lg[data-lg=weather] .curve", panel); if (wc) drawCurve(wc, WXH.curve); }
+  if (!RM && matchMedia("(pointer: fine)").matches) $$(".lg", panel).forEach((c) => c.addEventListener("pointermove", (e) => {
+    const r = c.getBoundingClientRect(); c.style.setProperty("--mx", ((e.clientX - r.left) / r.width) * 100 + "%"); c.style.setProperty("--my", ((e.clientY - r.top) / r.height) * 100 + "%"); }));
+  try { localStorage.setItem("hubSport", sp.id); } catch (e) { /* без сохранения */ }
+  if (push && location.hash !== "#" + sp.id) history.replaceState(null, "", "#" + sp.id);
+}
+let start = location.hash.slice(1); try { start = start || localStorage.getItem("hubSport") || ""; } catch (e) { /* без сохранения */ }
+show(start, false);
+addEventListener("hashchange", () => { const h = location.hash.slice(1); if (h && h !== CUR) show(h, false); });
+
+/* числа вверху: плавный набор от нуля */
+function countUp(el, to, fmt) {
+  if (RM) { el.textContent = fmt(to); return; }
+  const t0 = performance.now(), dur = 1200;
+  const step = (now) => { const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 4); el.textContent = fmt(to * e); if (k < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+
+fetch("/api/hub").then((r) => r.json()).then((d) => {
+  HUB = d;
+  let games = 0, players = 0, bets = 0, pnl = 0;
+  for (const sp of ["nba", "nhl", "nfl", "euro"]) {
+    const s = d[sp], pill = $("#p-" + sp), bot = s && s.bot;
+    pill.classList.toggle("on", !!(bot && bot.alive));
+    pill.title = bot && bot.alive ? (bot.real ? "робот работает: реальные ставки + бумага" : "робот работает: бумага") : "робот не запущен";
+    if (!s) continue;
+    games += s.games || 0; players += s.players || 0; bets += (s.sim && s.sim.n) || 0; pnl += (s.sim && s.sim.pnl) || 0;
+  }
+  $$(".tab").forEach((t) => { const sp = SPORTS.find((x) => x.id === t.dataset.sp); if (sp && !sp.soon) $(".dot", t).classList.toggle("on", sp.leagues.some((l) => !l.soon && d[l.id] && d[l.id].bot && d[l.id].bot.alive)); });
+  countUp($("[data-k=games]"), games, nf); countUp($("[data-k=players]"), players, nf); countUp($("[data-k=bets]"), bets, nf);
+  const pv = $("[data-k=pnl]"); pv.classList.add(pnl >= 0 ? "good" : "bad"); countUp(pv, pnl, money);
+  show(CUR, false);
+}).catch(() => { $$(".kpi .skel").forEach((x) => (x.parentElement.textContent = "—")); HUB = {}; show(CUR, false); });
+fetch("/api/weather/hub").then((r) => r.json()).then((d) => {
+  WXH = d;
+  const pill = $("#p-weather");
+  if (pill) { pill.classList.toggle("on", !!(d.alive && d.enabled)); pill.title = d.alive ? (d.enabled ? "робот погоды работает: бумага" : "робот погоды работает, ставки выключены") : "робот погоды не запущен"; }
+  const t = $(".tab[data-sp=weather] .dot"); if (t) t.classList.toggle("on", !!(d.alive && d.enabled));
+  show(CUR, false);
+}).catch(() => { /* погода недоступна — остальное работает */ });
+</script>
+</body>
+</html>

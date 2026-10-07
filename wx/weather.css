@@ -1,0 +1,79 @@
+/* Погода: небольшие добавки к app.css / ux.css (цвета и классы сайта те же) */
+:root { --sky: #38bdf8; --sky-soft: rgba(56, 189, 248, .14); }
+.wx-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.wx-pill { display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--card-2); font-size: 12px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.wx-pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); }
+.wx-pill.on { color: var(--text); } .wx-pill.on i { background: var(--good); animation: wxbeat 2s infinite; }
+.wx-pill.off i { background: var(--bad); } .wx-pill.paused i { background: var(--gold); }
+@keyframes wxbeat { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--good) 70%, transparent); } 70%, 100% { box-shadow: 0 0 0 7px transparent; } }
+.wx-hero { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; margin: 22px 0 16px; }
+@media (max-width: 860px) { .wx-hero { grid-template-columns: 1fr; } }
+.wx-sw { display: flex; align-items: center; gap: 16px; padding: 18px; }
+.wx-sw .txt b { display: block; font-size: 16px; } .wx-sw .txt span { color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+.wx-big { position: relative; flex: none; width: 74px; height: 40px; border-radius: 999px; background: var(--card-2); border: 1px solid var(--line-2); cursor: pointer; transition: .25s; }
+.wx-big::after { content: ""; position: absolute; top: 4px; left: 4px; width: 30px; height: 30px; border-radius: 50%; background: var(--muted); transition: .25s; }
+.wx-big.on { background: var(--good); border-color: var(--good); } .wx-big.on::after { transform: translateX(34px); background: #fff; }
+.wx-big[disabled] { opacity: .5; cursor: wait; }
+.wx-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.wx-kpi { padding: 14px 16px; }
+.wx-kpi .l { color: var(--faint); font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
+.wx-kpi .v { font-family: var(--display); font-size: 28px; font-weight: 700; line-height: 1.1; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.wx-kpi .s { color: var(--faint); font-size: 12px; margin-top: 2px; }
+.wx-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 900px) { .wx-grid2 { grid-template-columns: 1fr; } }
+.wx-form { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; margin-top: 12px; }
+.wx-form label { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.wx-form .input, .wx-form .select { min-width: 0; width: 100%; }
+.wx-form label.off { opacity: .4; }
+.wx-form .chk { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 10px 14px; padding-top: 4px; }
+.wx-form .chk label { flex-direction: row; align-items: center; gap: 6px; font-weight: 500; }
+.wx-form .full { grid-column: 1 / -1; }
+.wx-fieldset { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px 14px; margin: 14px 0 0; }
+.wx-fieldset > b { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--faint); }
+.wx-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; align-items: center; }
+.wx-btn { padding: 9px 16px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--card-2); cursor: pointer; font-weight: 700; font-size: 13px; }
+.wx-btn:hover { border-color: var(--accent); }
+.wx-btn.pri { background: var(--accent); border-color: var(--accent); color: #1a0d03; }
+.wx-btn[disabled] { opacity: .5; cursor: wait; }
+.wx-note { color: var(--faint); font-size: 12px; line-height: 1.55; margin-top: 10px; }
+.wx-warn { padding: 10px 14px; border-radius: 12px; background: color-mix(in srgb, var(--gold) 14%, transparent); border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent); font-size: 13px; line-height: 1.5; margin: 12px 0; }
+.wx-tag { display: inline-block; padding: 1px 7px; border-radius: 6px; font-size: 11px; font-weight: 800; }
+.wx-tag.y { background: var(--good-soft); color: var(--good); } .wx-tag.n { background: var(--blue-soft); color: var(--blue); }
+.wx-lv-buy { color: var(--good); } .wx-lv-settle { color: var(--accent); } .wx-lv-warn { color: var(--gold); } .wx-lv-error { color: var(--bad); }
+.wx-journal td.txt { text-align: left; white-space: normal; min-width: 280px; }
+.wx-gate { display: grid; gap: 8px; margin-top: 12px; }
+.wx-gate .row { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; font-size: 13px; }
+.wx-gate .bar { grid-column: 1 / -1; height: 6px; border-radius: 6px; background: var(--card-2); overflow: hidden; }
+.wx-gate .bar i { display: block; height: 100%; background: var(--accent); }
+.wx-gate .row.ok .bar i { background: var(--good); }
+.wx-rules h2 { font-family: var(--display); font-size: 24px; margin: 28px 0 8px; letter-spacing: .3px; }
+.wx-rules h3 { font-size: 15px; margin: 18px 0 6px; }
+.wx-rules p, .wx-rules li { line-height: 1.65; color: var(--text); }
+.wx-rules ul, .wx-rules ol { padding-left: 22px; }
+.wx-rules .step { display: grid; grid-template-columns: 34px 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.wx-rules .step:last-child { border-bottom: 0; }
+.wx-rules .step .n { width: 30px; height: 30px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 800; display: grid; place-items: center; }
+.wx-rules code { background: var(--card-2); padding: 1px 6px; border-radius: 6px; font-size: 12.5px; }
+.wx-rules table.tbl td.l, .wx-rules table.tbl th.l { white-space: normal; }
+.wx-bins { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.wx-bins td, .wx-bins th { padding: 5px 8px; text-align: right; border-bottom: 1px solid var(--line); }
+.wx-bins td:first-child, .wx-bins th:first-child { text-align: left; }
+.wx-bins tr.bet td { background: var(--good-soft); }
+.wx-bar { display: inline-block; height: 8px; border-radius: 4px; background: var(--sky); vertical-align: middle; }
+.wx-chips { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.wx-mon { display: flex; gap: 6px; flex-wrap: wrap; }
+.wx-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, .55); z-index: 100; display: grid; place-items: center; padding: 16px; }
+.wx-modal > div { background: var(--card); border: 1px solid var(--line-2); border-radius: 16px; max-width: 760px; width: 100%; max-height: 88vh; overflow: auto; padding: 18px 20px; }
+.wx-empty { padding: 34px 10px; text-align: center; color: var(--muted); }
+.tbl td.l { white-space: normal; }
+.wx-foot { margin: 40px 0 30px; color: var(--faint); font-size: 12px; }
+
+/* телефон: ничего не должно вылезать за экран */
+.wx-grid2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.wx-grid2 > *, .wx-hero > * { min-width: 0; }
+@media (max-width: 900px) { .wx-grid2, .wx-hero { grid-template-columns: minmax(0, 1fr); } }
+.toolbar .seg { flex-wrap: wrap; max-width: 100%; }
+.wx-rules .card-b, .card-b { min-width: 0; }
+@media (max-width: 600px) { .wx-kpi .v { font-size: 22px; } .page-head h1 { font-size: 28px; } .wx-sw { padding: 14px; } .wx-modal > div { padding: 14px; } }
+.wx-ext { margin-left: 5px; color: var(--muted); text-decoration: none; font-size: 12px; opacity: .55; }
+.wx-ext:hover { opacity: 1; color: var(--accent); }
